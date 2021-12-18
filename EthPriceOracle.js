@@ -51,11 +51,10 @@ async function processRequest(oracleContract, ownerAddress, id, callerAddress) {
   while(retries < MAX_RETRIES) {
     try {
       const ethPrice = await GetETHPrice();
-      console.log(ethPrice, "ethPrice");
       await setLatestEthPrice(oracleContract, callerAddress, ownerAddress, ethPrice, id);
+      console.log("Nice"); 
       return;
     } catch (error) {
-      console.log("palo con binance");
       if(retries === MAX_RETRIES - 1){
         await setLatestEthPrice(oracleContract, callerAddress, ownerAddress, '0', id);
         return;
@@ -66,7 +65,9 @@ async function processRequest(oracleContract, ownerAddress, id, callerAddress) {
 }
 
 async function setLatestEthPrice (oracleContract, callerAddress, ownerAddress, ethPrice, id) {
-  ethPrice = ethPrice.replace('.','');
+  console.log(ethPrice, "eth price before replace");
+  ethPrice = ethPrice.toString().replace('.','');
+  console.log(ethPrice, "eth price after replace");
   const multiplier = new BN(10**10, 10);
   const ethPriceInt = (new BN(parseInt(ethPrice), 10)).mul(multiplier)
   const idInt = new BN(parseInt(id))
@@ -79,7 +80,6 @@ async function setLatestEthPrice (oracleContract, callerAddress, ownerAddress, e
 }
 
 async function GetETHPrice() {
-
   let resp = await CoinGeckoClient.simple.price({
       ids: 'ethereum',
       vs_currencies:'usd',
